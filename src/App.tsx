@@ -3,14 +3,18 @@ import { DateSelector } from './components/DateSelector';
 import { TodoList } from './components/TodoList';
 import { CalendarView } from './components/CalendarView';
 import { RecordView } from './components/RecordView';
+import { LoginView } from './components/LoginView';
 import { useTodos } from './hooks/useTodos';
 import { useMoodRecords } from './hooks/useMoodRecords';
+import { getCurrentUser } from './hooks/useCloudStorage';
 
 type TabType = 'todo' | 'calendar' | 'record';
 
 function App() {
     const [selectedDate, setSelectedDate] = useState('');
     const [currentTab, setCurrentTab] = useState<TabType>('todo');
+    const [isLoggedIn, setIsLoggedIn] = useState(!!getCurrentUser());
+
     const { getTodosByDate, toggleTodo, addTodo, getTodoCounts, todos } = useTodos();
     const { records, addRecord } = useMoodRecords();
 
@@ -21,6 +25,10 @@ function App() {
         const day = String(today.getDate()).padStart(2, '0');
         setSelectedDate(`${year}-${month}-${day}`);
     }, []);
+
+    useEffect(() => {
+        setIsLoggedIn(!!getCurrentUser());
+    }, [isLoggedIn]);
 
     const selectedTodos = getTodosByDate(selectedDate);
     const todoCounts = getTodoCounts();
@@ -36,6 +44,10 @@ function App() {
         return map;
     }, [todos]);
 
+    const handleLoginSuccess = () => {
+        setIsLoggedIn(true);
+    };
+
     const handleDateSelectFromCalendar = (date: string) => {
         setSelectedDate(date);
     };
@@ -43,6 +55,10 @@ function App() {
     const handleBackToTodo = () => {
         setCurrentTab('todo');
     };
+
+    if (!isLoggedIn) {
+        return <LoginView onLoginSuccess={handleLoginSuccess} />;
+    }
 
     const renderContent = () => {
         switch (currentTab) {
@@ -83,9 +99,7 @@ function App() {
 
     return (
         <div className="min-h-screen bg-beige-100 flex flex-col max-w-md mx-auto">
-            <div className={`flex-1 flex flex-col md:flex-row w-full shadow-lg overflow-hidden ${
-                currentTab === 'calendar' || currentTab === 'record' ? '' : ''
-            }`}>
+            <div className="flex-1 flex flex-col md:flex-row w-full shadow-lg overflow-hidden">
                 {renderContent()}
             </div>
             <div className="h-16 bg-beige-200 flex items-center justify-around px-6">

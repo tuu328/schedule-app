@@ -1,27 +1,33 @@
 import { useState, useEffect } from 'react';
 import type { MoodRecord } from '../data/moodData';
 import { mockMoodRecords } from '../data/moodData';
-
-const STORAGE_KEY = 'mood-app-data';
+import { getCurrentUser, getUserData, saveUserData } from './useCloudStorage';
 
 export const useMoodRecords = () => {
     const [records, setRecords] = useState<MoodRecord[]>([]);
+    const [user, setUser] = useState(getCurrentUser());
 
     useEffect(() => {
-        const stored = localStorage.getItem(STORAGE_KEY);
-        if (stored) {
-            setRecords(JSON.parse(stored));
+        const currentUser = getCurrentUser();
+        setUser(currentUser);
+
+        if (currentUser) {
+            const stored = getUserData(currentUser.phone, 'moodRecords');
+            if (stored) {
+                setRecords(stored);
+            } else {
+                setRecords(mockMoodRecords);
+            }
         } else {
             setRecords(mockMoodRecords);
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(mockMoodRecords));
         }
     }, []);
 
     useEffect(() => {
-        if (records.length > 0) {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+        if (user) {
+            saveUserData(user.phone, 'moodRecords', records);
         }
-    }, [records]);
+    }, [records, user]);
 
     const addRecord = (date: string, mood: MoodRecord['mood'], note: string) => {
         const existing = records.find(r => r.date === date);

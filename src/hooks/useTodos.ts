@@ -1,31 +1,37 @@
 import { useState, useEffect } from 'react';
 import type { Todo } from '../data/mockData';
 import { mockTodos } from '../data/mockData';
-
-const STORAGE_KEY = 'todo-app-data';
+import { getCurrentUser, getUserData, saveUserData } from './useCloudStorage';
 
 export const useTodos = () => {
     const [todos, setTodos] = useState<Todo[]>([]);
+    const [user, setUser] = useState(getCurrentUser());
 
     useEffect(() => {
-        const stored = localStorage.getItem(STORAGE_KEY);
-        if (stored) {
-            setTodos(JSON.parse(stored));
+        const currentUser = getCurrentUser();
+        setUser(currentUser);
+
+        if (currentUser) {
+            const stored = getUserData(currentUser.phone, 'todos');
+            if (stored) {
+                setTodos(stored);
+            } else {
+                setTodos(mockTodos);
+            }
         } else {
             setTodos(mockTodos);
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(mockTodos));
         }
     }, []);
 
     useEffect(() => {
-        if (todos.length > 0) {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(todos));
+        if (user && todos.length >= 0) {
+            saveUserData(user.phone, 'todos', todos);
         }
-    }, [todos]);
+    }, [todos, user]);
 
     const toggleTodo = (id: string) => {
-        setTodos(prev => 
-            prev.map(todo => 
+        setTodos(prev =>
+            prev.map(todo =>
                 todo.id === id ? { ...todo, completed: !todo.completed } : todo
             )
         );
