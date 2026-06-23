@@ -94,7 +94,7 @@ export const RecordView = ({ records, todos, selectedDate, onAddRecord, onDateSe
                         <span className="text-sm text-gray-400">{currentDayInfo?.weekDay}</span>
                     </div>
                 </div>
-                <div className="flex-1 overflow-y-auto p-3 min-h-0">
+                <div className="flex-1 overflow-y-auto p-3 min-h-0 border-b border-beige-100">
                     {dayTodos.length === 0 ? (
                         <div className="text-center text-gray-400 py-4">
                             <p className="text-xs">暂无待办</p>
@@ -110,14 +110,14 @@ export const RecordView = ({ records, todos, selectedDate, onAddRecord, onDateSe
                         </div>
                     )}
                 </div>
-                <div className="p-3 border-t border-beige-100 flex-shrink-0">
-                    <div className="text-xs text-gray-400 mb-2">心情</div>
-                    <div className="flex gap-1.5 mb-3">
+                <div className="flex-1 overflow-y-auto p-3 min-h-0 flex flex-col">
+                    <div className="text-xs text-gray-400 mb-2 flex-shrink-0">心情</div>
+                    <div className="flex gap-1.5 mb-3 flex-shrink-0">
                         {moods.map((mood) => (
                             <button
                                 key={mood.value}
                                 onClick={() => setEditingMood(mood.value)}
-                                className={`w-8 h-8 rounded-full flex items-center justify-center text-base transition-all flex-shrink-0 ${
+                                className={`w-9 h-9 rounded-full flex items-center justify-center text-lg transition-all flex-shrink-0 ${
                                     editingMood === mood.value
                                         ? 'ring-2 ring-pink-300 scale-110'
                                         : 'hover:bg-beige-100'
@@ -128,16 +128,16 @@ export const RecordView = ({ records, todos, selectedDate, onAddRecord, onDateSe
                             </button>
                         ))}
                     </div>
-                    <div className="text-xs text-gray-400 mb-1">日记</div>
+                    <div className="text-xs text-gray-400 mb-1 flex-shrink-0">日记</div>
                     <textarea
                         value={editingNote}
                         onChange={(e) => setEditingNote(e.target.value)}
                         placeholder="写下今天的心情..."
-                        className="w-full h-16 p-2 border border-beige-200 rounded-lg resize-none focus:outline-none focus:border-pink-300 text-xs text-gray-700"
+                        className="flex-1 min-h-[80px] w-full p-2 border border-beige-200 rounded-lg resize-none focus:outline-none focus:border-pink-300 text-sm text-gray-700"
                     />
                     <button
                         onClick={handleSaveRecord}
-                        className="w-full mt-2 py-1.5 bg-pink-100 hover:bg-pink-200 text-pink-600 rounded-lg text-xs font-medium transition-colors"
+                        className="w-full mt-2 py-2 bg-pink-100 hover:bg-pink-200 text-pink-600 rounded-lg text-sm font-medium transition-colors flex-shrink-0"
                     >
                         保存
                     </button>
