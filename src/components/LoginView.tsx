@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { registerUser, loginUser, setCurrentUser } from '../hooks/useCloudStorage';
+import { useState, useEffect } from 'react';
+import { registerUser, loginUser, onAuthStateChange } from '../hooks/useCloudStorage';
 
 interface LoginViewProps {
     onLoginSuccess: () => void;
@@ -12,6 +12,16 @@ export const LoginView = ({ onLoginSuccess }: LoginViewProps) => {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+
+    // 如果已经登录，直接跳出去
+    useEffect(() => {
+        const { data: { subscription } } = onAuthStateChange((user) => {
+            if (user) {
+                onLoginSuccess();
+            }
+        });
+        return () => subscription.unsubscribe();
+    }, [onLoginSuccess]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -33,34 +43,36 @@ export const LoginView = ({ onLoginSuccess }: LoginViewProps) => {
         }
 
         setLoading(true);
-
-        setTimeout(() => {
+        try {
             if (mode === 'register') {
-                const result = registerUser(phone, password);
+                const result = await registerUser(phone, password);
                 if (!result.success) {
                     setError(result.message);
                     setLoading(false);
                     return;
                 }
-                const loginResult = loginUser(phone, password);
-                if (loginResult.success && loginResult.user) {
-                    setCurrentUser(loginResult.user);
-                    onLoginSuccess();
+                // 注册成功后自动登录
+                const loginResult = await loginUser(phone, password);
+                if (!loginResult.success) {
+                    setError(loginResult.message);
+                    setLoading(false);
+                    return;
                 }
+                onLoginSuccess();
             } else {
-                const result = loginUser(phone, password);
+                const result = await loginUser(phone, password);
                 if (!result.success) {
                     setError(result.message);
                     setLoading(false);
                     return;
                 }
-                if (result.user) {
-                    setCurrentUser(result.user);
-                    onLoginSuccess();
-                }
+                onLoginSuccess();
             }
+        } catch (err: any) {
+            setError(err?.message || '操作失败，请重试');
+        } finally {
             setLoading(false);
-        }, 300);
+        }
     };
 
     return (
