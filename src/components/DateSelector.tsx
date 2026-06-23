@@ -1,4 +1,4 @@
-import { getWeekDays } from '../data/mockData';
+import { getWeekDays, getWeekNumber } from '../data/mockData';
 
 interface DateSelectorProps {
     selectedDate: string;
@@ -7,31 +7,24 @@ interface DateSelectorProps {
 
 export const DateSelector = ({ selectedDate, onDateSelect }: DateSelectorProps) => {
     const weekDays = getWeekDays();
+    const weekNumber = getWeekNumber();
 
     return (
-        <div className="w-full md:w-64 lg:w-72 bg-white border-r border-beige-200 flex flex-col">
-            <div className="p-4 border-b border-beige-200 bg-beige-100">
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                        <span className="text-lg font-semibold text-gray-700">27周</span>
-                        <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                        </svg>
-                    </div>
-                    
-                </div>
+        <div className="w-20 sm:w-24 bg-white border-r border-beige-200 flex flex-col flex-shrink-0">
+            <div className="p-2 border-b border-beige-200 bg-beige-100 flex-shrink-0 text-center">
+                <span className="text-xs font-semibold text-gray-700">{weekNumber}周</span>
             </div>
             <div className="flex-1 overflow-y-auto scrollbar-hide">
                 {weekDays.map((item) => (
                     <div
                         key={item.date}
-                        className={`date-item p-4 border-b border-beige-100 ${
+                        className={`date-item p-1.5 border-b border-beige-100 text-center ${
                             selectedDate === item.date ? 'selected' : ''
                         } ${item.isToday ? 'today' : ''}`}
                         onClick={() => onDateSelect(item.date)}
                     >
-                        <div className="text-2xl text-gray-800">{item.day}</div>
-                        <div className="text-sm text-gray-500 mt-1">{item.weekDay}</div>
+                        <div className="text-base text-gray-800 leading-tight">{item.day}</div>
+                        <div className="text-[10px] text-gray-500 mt-0.5">{item.weekDay}</div>
                     </div>
                 ))}
             </div>

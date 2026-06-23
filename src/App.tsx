@@ -99,9 +99,7 @@ function App() {
 
     return (
         <div className="min-h-screen bg-beige-100 flex flex-col max-w-2xl mx-auto">
-            <div className={`flex-1 flex w-full shadow-lg overflow-hidden ${
-                currentTab === 'record' ? 'flex-row' : 'flex-col md:flex-row'
-            }`}>
+            <div className="flex-1 flex flex-row w-full shadow-lg overflow-hidden">
                 {renderContent()}
             </div>
             <div className="h-16 bg-beige-200 flex items-center justify-around px-6">
